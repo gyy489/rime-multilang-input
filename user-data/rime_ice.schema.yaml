@@ -41,10 +41,13 @@ switches:
 # 输入引擎
 engine:
   processors:
+    - lua_processor@*shift_punct_toggle
     - lua_processor@*select_character  # 以词定字
     - ascii_composer
     - recognizer
     - key_binder
+    - lua_processor@*mac_punctuation
+    - lua_processor@*code_punctuation
     - speller
     - punctuator
     - selector
