@@ -1,0 +1,9 @@
+# Rime patch
+# encoding: utf-8
+
+patch:
+  schema_list:
+    - schema: rime_ice
+  menu/page_size: 9
+  ascii_composer/switch_key/Shift_L: noop
+  ascii_composer/switch_key/Shift_R: noop

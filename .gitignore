@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# Local/generated Rime state
+installation.yaml
+build/
+backups/
+user-data/build/
+user-data/installation.yaml
+user-data/user.yaml
+user-data/english_learning.tsv
+user-data/shift_debug.log
+user-data/sync/
+user-data/*.userdb/
+
+# Local installer/app backups. The README installer downloads these again.
+installers/
+apps/
+
+# Retired optional Karabiner experiment. Lightweight setup does not use it.
+karabiner/
+scripts/*karabiner*.sh
+
+# Downloaded upstream/cache datasets. Keep generator scripts and small config files in git.
+sources/rime-ice/
+sources/ecdict/*.csv
+sources/cedict/*.zip
+sources/cedict/*.u8
+
+# Temporary extraction directories
+.tmp*/
+tmp/

@@ -1,0 +1,20 @@
+# Rime patch
+# encoding: utf-8
+
+patch:
+  engine/processors:
+    - ascii_composer
+    - key_binder
+    - speller
+    - recognizer
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  punctuator:
+    half_shape:
+      "~": "~"
+      "`": "`"
+    full_shape:
+      "~": "~"
+      "`": "`"

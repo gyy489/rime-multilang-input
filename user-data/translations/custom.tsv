@@ -1,0 +1,57 @@
+# lang	key	value
+# lang: en means English candidate -> Chinese note.
+# lang: zh means Chinese candidate -> English note.
+en	hello	你好
+en	good	好
+en	ok	好的
+en	yes	是
+en	no	不
+zh	你好	hello
+zh	中文	Chinese
+zh	英文	English
+zh	输入	input
+zh	后来	later
+en	API	接口
+en	SDK	开发工具包
+en	CLI	命令行
+en	IDE	集成开发环境
+en	JSON	数据格式
+en	YAML	配置格式
+en	GraphQL	查询语言
+en	Docker	容器
+en	Kubernetes	容器编排
+en	GitHub	代码托管
+en	commit	提交
+en	rebase	变基
+en	merge	合并
+en	branch	分支
+en	pull request	合并请求
+en	code review	代码审查
+en	frontend	前端
+en	backend	后端
+en	middleware	中间件
+en	callback	回调
+en	async	异步
+en	await	等待
+en	regex	正则表达式
+en	database	数据库
+en	endpoint	接口端点
+en	payload	载荷
+en	request	请求
+en	response	响应
+en	authentication	认证
+en	authorization	授权
+en	deploy	部署
+en	rollback	回滚
+en	staging	预发环境
+en	production	生产环境
+zh	字符串	string
+zh	初始化	initialization
+zh	数组	array
+zh	编译器	compiler
+zh	正则表达式	regex
+zh	数据库	database
+zh	中间件	middleware
+zh	回调	callback
+zh	接口	interface
+zh	部署	deploy

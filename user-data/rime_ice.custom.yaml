@@ -1,0 +1,81 @@
+# Rime patch
+# encoding: utf-8
+
+patch:
+  schema/dependencies:
+    - melt_eng
+    - radical_pinyin
+    - fr
+
+  # Default to US/ASCII punctuation. Tap Shift or Control+Shift+3 to toggle Chinese punctuation.
+  switches/@1/reset: 1
+
+  engine/processors:
+    - lua_processor@*shift_punct_toggle
+    - lua_processor@*select_character
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - lua_processor@*mac_punctuation
+    - lua_processor@*code_punctuation
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - lua_processor@*english_learning_processor
+    - express_editor
+
+  engine/translators:
+    - punct_translator
+    - script_translator
+    - lua_translator@*date_translator
+    - lua_translator@*lunar
+    - lua_translator@*uuid
+    - table_translator@custom_phrase
+    - table_translator@melt_eng
+    - table_translator@french
+    - table_translator@cn_en
+    - table_translator@radical_lookup
+    - lua_translator@*unicode
+    - lua_translator@*number_translator
+    - lua_translator@*calc_translator
+    - lua_translator@*force_gc
+
+  engine/filters:
+    - lua_filter@*corrector
+    - reverse_lookup_filter@radical_reverse_lookup
+    - lua_filter@*autocap_filter
+    - lua_filter@*v_filter
+    - lua_filter@*pin_cand_filter
+    - lua_filter@*long_word_filter
+    - lua_filter@*reduce_english_filter
+    - lua_filter@*english_learning_filter
+    - simplifier@emoji
+    - simplifier@traditionalize
+    - lua_filter@*search@radical_pinyin
+    - lua_filter@*translation_comment
+    - uniquifier
+
+  french:
+    dictionary: fr
+    enable_completion: true
+    enable_sentence: false
+    enable_user_dict: false
+    initial_quality: 0.85
+    comment_format:
+      - xform/^.+$/〔FR〕/
+
+  melt_eng:
+    dictionary: melt_eng
+    enable_completion: true
+    enable_sentence: false
+    enable_user_dict: true
+    initial_quality: 1.35
+    comment_format:
+      - xform/^.+$//
+
+  english_learning:
+    scan_limit: 20
+    promote_to_first_at: 5
+
+  translation_comment/enabled: true

@@ -1,0 +1,266 @@
+# Rime dictionary
+# encoding: utf-8
+#
+# Developer English terms for mixed coding input.
+
+---
+name: dev
+version: "2026-05-16"
+sort: by_weight
+columns:
+  - text
+  - code
+  - weight
+...
+API	API	1000
+SDK	SDK	1000
+CLI	CLI	1000
+GUI	GUI	900
+TUI	TUI	700
+IDE	IDE	1000
+REPL	REPL	800
+URI	URI	800
+URL	URL	1000
+HTTP	HTTP	1000
+HTTPS	HTTPS	1000
+JSON	JSON	1000
+JSONL	JSONL	700
+YAML	YAML	1000
+TOML	TOML	800
+XML	XML	900
+CSV	CSV	900
+HTML	HTML	1000
+CSS	CSS	1000
+JavaScript	JavaScript	1000
+TypeScript	TypeScript	1000
+JS	JS	1000
+JSX	JSX	900
+TS	TS	900
+TSX	TSX	900
+SQL	SQL	1000
+NoSQL	NoSQL	900
+GraphQL	GraphQL	1000
+REST	REST	1000
+RESTful	RESTful	900
+gRPC	gRPC	900
+WebSocket	WebSocket	900
+OAuth	OAuth	900
+JWT	JWT	900
+CORS	CORS	900
+CDN	CDN	900
+DNS	DNS	900
+TCP	TCP	900
+UDP	UDP	900
+TLS	TLS	900
+SSL	SSL	800
+SSH	SSH	1000
+SFTP	SFTP	700
+SMTP	SMTP	700
+IMAP	IMAP	700
+OpenAPI	OpenAPI	900
+Swagger	Swagger	800
+Postman	Postman	800
+cURL	cURL	800
+Docker	Docker	1000
+Dockerfile	Dockerfile	1000
+Docker Compose	DockerCompose	900
+Kubernetes	Kubernetes	1000
+K8s	K8s	1000
+Helm	Helm	800
+Terraform	Terraform	800
+Ansible	Ansible	700
+Nginx	Nginx	900
+Redis	Redis	900
+PostgreSQL	PostgreSQL	900
+Postgres	Postgres	900
+MySQL	MySQL	900
+SQLite	SQLite	900
+MongoDB	MongoDB	900
+Elasticsearch	Elasticsearch	800
+Kafka	Kafka	800
+RabbitMQ	RabbitMQ	700
+React	React	1000
+React Native	ReactNative	900
+Vue	Vue	1000
+Vue.js	Vue.js	1000
+Angular	Angular	800
+Svelte	Svelte	800
+Next.js	Next.js	1000
+Nuxt	Nuxt	800
+Vite	Vite	900
+Webpack	Webpack	900
+Rollup	Rollup	700
+Babel	Babel	800
+ESLint	ESLint	800
+Prettier	Prettier	800
+Tailwind CSS	TailwindCSS	900
+Node.js	Node.js	1000
+npm	npm	1000
+pnpm	pnpm	900
+yarn	yarn	800
+Bun	Bun	800
+Deno	Deno	800
+Python	Python	1000
+Java	Java	1000
+Kotlin	Kotlin	800
+Swift	Swift	800
+Rust	Rust	900
+Go	Go	900
+Golang	Golang	900
+Ruby	Ruby	700
+PHP	PHP	800
+Lua	Lua	700
+Bash	Bash	900
+Zsh	Zsh	800
+PowerShell	PowerShell	800
+C++	C++	900
+C#	C#	900
+Objective-C	Objective-C	700
+FastAPI	FastAPI	800
+Django	Django	800
+Flask	Flask	800
+Express	Express	800
+NestJS	NestJS	800
+Spring Boot	SpringBoot	800
+SQLAlchemy	SQLAlchemy	700
+Git	Git	1000
+GitHub	GitHub	1000
+GitLab	GitLab	900
+Bitbucket	Bitbucket	700
+commit	commit	1000
+rebase	rebase	900
+merge	merge	900
+branch	branch	900
+stash	stash	800
+cherry-pick	cherry-pick	700
+pull request	pullrequest	1000
+code review	codereview	900
+CI	CI	900
+CD	CD	800
+CI/CD	CICD	900
+GitHub Actions	GitHubActions	900
+Jenkins	Jenkins	700
+CircleCI	CircleCI	700
+Travis CI	TravisCI	700
+frontend	frontend	1000
+backend	backend	1000
+full-stack	fullstack	800
+middleware	middleware	1000
+microservice	microservice	900
+monorepo	monorepo	900
+polyrepo	polyrepo	700
+callback	callback	1000
+promise	promise	900
+async	async	1000
+await	await	1000
+coroutine	coroutine	800
+generator	generator	700
+iterator	iterator	800
+observable	observable	700
+stream	stream	800
+buffer	buffer	800
+cache	cache	900
+caching	caching	800
+memoization	memoization	700
+debounce	debounce	800
+throttle	throttle	800
+regex	regex	1000
+regexp	regexp	900
+regular expression	regularexpression	900
+serialization	serialization	800
+deserialization	deserialization	800
+idempotent	idempotent	700
+concurrency	concurrency	900
+parallelism	parallelism	800
+thread	thread	900
+process	process	800
+mutex	mutex	800
+semaphore	semaphore	700
+deadlock	deadlock	800
+race condition	racecondition	800
+event loop	eventloop	900
+garbage collection	garbagecollection	800
+heap	heap	800
+stack	stack	800
+pointer	pointer	800
+reference	reference	800
+closure	closure	900
+lambda	lambda	800
+recursion	recursion	800
+dynamic programming	dynamicprogramming	800
+binary search	binarysearch	800
+hash map	hashmap	800
+linked list	linkedlist	800
+tree	tree	700
+trie	trie	700
+graph	graph	700
+queue	queue	800
+object	object	800
+class	class	900
+interface	interface	900
+enum	enum	800
+struct	struct	800
+generic	generic	800
+template	template	800
+namespace	namespace	800
+module	module	900
+package	package	900
+dependency	dependency	900
+dev dependency	devdependency	800
+lockfile	lockfile	800
+semver	semver	800
+versioning	versioning	700
+release	release	800
+changelog	changelog	800
+migration	migration	800
+schema	schema	900
+database	database	1000
+index	index	800
+query	query	900
+transaction	transaction	800
+ACID	ACID	700
+CRUD	CRUD	800
+ORM	ORM	800
+endpoint	endpoint	900
+webhook	webhook	800
+payload	payload	900
+request	request	900
+response	response	900
+header	header	800
+cookie	cookie	800
+session	session	800
+token	token	800
+authentication	authentication	800
+authorization	authorization	800
+encryption	encryption	800
+hashing	hashing	800
+salt	salt	700
+secret	secret	800
+environment variable	environmentvariable	800
+dotenv	dotenv	700
+localhost	localhost	900
+feature flag	featureflag	800
+bug	bug	900
+hotfix	hotfix	800
+regression	regression	800
+unit test	unittest	900
+integration test	integrationtest	900
+E2E test	E2Etest	900
+snapshot test	snapshottest	700
+mock	mock	800
+stub	stub	700
+fixture	fixture	700
+lint	lint	800
+format	format	800
+build	build	900
+deploy	deploy	900
+rollback	rollback	800
+staging	staging	800
+production	production	800
+development	development	800
+sandbox	sandbox	800
+observability	observability	700
+logging	logging	800
+metrics	metrics	800
+tracing	tracing	800
+alerting	alerting	700

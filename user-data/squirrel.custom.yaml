@@ -1,0 +1,43 @@
+# Squirrel skin patch
+# encoding: utf-8
+
+patch:
+  config_version: '2026-05-16-system-current'
+  style/color_scheme: system_current
+  style/color_scheme_dark: system_current
+  style/candidate_list_layout: stacked
+  style/text_orientation: horizontal
+  style/inline_preedit: true
+  style/inline_candidate: false
+  style/memorize_size: true
+  style/translucency: false
+  style/mutual_exclusive: true
+  style/show_paging: false
+  style/corner_radius: 6
+  style/hilited_corner_radius: 0
+  style/border_height: 0
+  style/border_width: 0
+  style/line_spacing: 6
+  style/spacing: 8
+  style/shadow_size: 0
+  style/candidate_format: "[label]. [candidate] [comment]"
+
+  preset_color_schemes/system_current:
+    name: "System Current"
+    author: "Codex"
+    color_space: srgb
+    alpha: 1
+    back_color: 0x1E1E1E
+    border_color: 0x1E1E1E
+    candidate_back_color: 0x1E1E1E
+    preedit_back_color: 0x1E1E1E
+    hilited_back_color: 0xD15900
+    text_color: 0xFFFFFF
+    hilited_text_color: 0xFFFFFF
+    candidate_text_color: 0xFFFFFF
+    label_color: 0xA0A0A0
+    comment_text_color: 0xA0A0A0
+    hilited_candidate_back_color: 0xD15900
+    hilited_candidate_text_color: 0xFFFFFF
+    hilited_candidate_label_color: 0xFFFFFF
+    hilited_comment_text_color: 0xFFFFFF
