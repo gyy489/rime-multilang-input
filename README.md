@@ -158,14 +158,22 @@ rm -rf "$BASE/.tmp-squirrel"
 mkdir -p "$BASE/.tmp-squirrel/app"
 if [[ "$SQUIRREL_ARCHIVE" == *.zip ]]; then
   unzip -q "$BASE/installers/$SQUIRREL_ARCHIVE" -d "$BASE/.tmp-squirrel"
-  pkgutil --expand "$BASE/.tmp-squirrel/Squirrel.pkg" "$BASE/.tmp-squirrel/pkg"
+  SQUIRREL_PKG_PATH="$BASE/.tmp-squirrel/Squirrel.pkg"
 else
-  pkgutil --expand "$BASE/installers/$SQUIRREL_ARCHIVE" "$BASE/.tmp-squirrel/pkg"
+  SQUIRREL_PKG_PATH="$BASE/installers/$SQUIRREL_ARCHIVE"
 fi
+
+echo "==> Run official Squirrel installer"
+sudo installer -pkg "$SQUIRREL_PKG_PATH" -target /
+
+pkgutil --expand "$SQUIRREL_PKG_PATH" "$BASE/.tmp-squirrel/pkg"
 tar -xzf "$BASE/.tmp-squirrel/pkg/Payload" -C "$BASE/.tmp-squirrel/app" ./Squirrel.app
 ditto "$BASE/.tmp-squirrel/app/Squirrel.app" "$BASE/apps/Squirrel.app"
-mkdir -p "$HOME/Library/Input Methods"
-ditto "$BASE/apps/Squirrel.app" "$HOME/Library/Input Methods/Squirrel.app"
+
+SQUIRREL_APP="/Library/Input Methods/Squirrel.app"
+if [ ! -d "$SQUIRREL_APP" ]; then
+  SQUIRREL_APP="$HOME/Library/Input Methods/Squirrel.app"
+fi
 
 echo "==> Download rime-ice"
 if [ -d "$BASE/sources/rime-ice/.git" ]; then
@@ -1476,12 +1484,12 @@ ln -s "$BASE/user-data" "$HOME/Library/Rime"
 
 echo "==> Build and reload"
 cd "$BASE/user-data"
-if ! "$HOME/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel" --build; then
+if ! "$SQUIRREL_APP/Contents/MacOS/Squirrel" --build; then
   echo "Squirrel ${SQUIRREL_VERSION} failed to launch on macOS ${MACOS_VERSION}." >&2
   echo "Try upgrading macOS, or install a different Squirrel release manually." >&2
   exit 1
 fi
-"$HOME/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel" --reload
+"$SQUIRREL_APP/Contents/MacOS/Squirrel" --reload
 "$BASE/scripts/reload_and_select_squirrel.sh"
 
 echo
