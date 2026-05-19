@@ -117,8 +117,16 @@ cat > /tmp/install_rime_multilang.sh <<'INSTALL_RIME'
 set -euo pipefail
 
 BASE="${RIME_PORTABLE_DIR:-$HOME/Rime输入法}"
-SQUIRREL_VERSION="1.1.2"
-SQUIRREL_PKG="Squirrel-${SQUIRREL_VERSION}.pkg"
+MACOS_VERSION="$(sw_vers -productVersion)"
+MACOS_MAJOR="${MACOS_VERSION%%.*}"
+
+if [ "${MACOS_MAJOR}" -ge 13 ]; then
+  SQUIRREL_VERSION="1.1.2"
+  SQUIRREL_ARCHIVE="Squirrel-${SQUIRREL_VERSION}.pkg"
+else
+  SQUIRREL_VERSION="0.16.2"
+  SQUIRREL_ARCHIVE="Squirrel-${SQUIRREL_VERSION}.zip"
+fi
 
 need() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -140,15 +148,20 @@ fi
 
 mkdir -p "$BASE"/{installers,apps,sources,user-data,scripts}
 
-echo "==> Download Squirrel ${SQUIRREL_VERSION}"
+echo "==> Download Squirrel ${SQUIRREL_VERSION} for macOS ${MACOS_VERSION}"
 curl -L --fail \
-  -o "$BASE/installers/$SQUIRREL_PKG" \
-  "https://github.com/rime/squirrel/releases/download/${SQUIRREL_VERSION}/${SQUIRREL_PKG}"
+  -o "$BASE/installers/$SQUIRREL_ARCHIVE" \
+  "https://github.com/rime/squirrel/releases/download/${SQUIRREL_VERSION}/${SQUIRREL_ARCHIVE}"
 
 echo "==> Extract and install Squirrel.app"
 rm -rf "$BASE/.tmp-squirrel"
 mkdir -p "$BASE/.tmp-squirrel/app"
-pkgutil --expand "$BASE/installers/$SQUIRREL_PKG" "$BASE/.tmp-squirrel/pkg"
+if [[ "$SQUIRREL_ARCHIVE" == *.zip ]]; then
+  unzip -q "$BASE/installers/$SQUIRREL_ARCHIVE" -d "$BASE/.tmp-squirrel"
+  pkgutil --expand "$BASE/.tmp-squirrel/Squirrel.pkg" "$BASE/.tmp-squirrel/pkg"
+else
+  pkgutil --expand "$BASE/installers/$SQUIRREL_ARCHIVE" "$BASE/.tmp-squirrel/pkg"
+fi
 tar -xzf "$BASE/.tmp-squirrel/pkg/Payload" -C "$BASE/.tmp-squirrel/app" ./Squirrel.app
 ditto "$BASE/.tmp-squirrel/app/Squirrel.app" "$BASE/apps/Squirrel.app"
 mkdir -p "$HOME/Library/Input Methods"
@@ -1463,7 +1476,11 @@ ln -s "$BASE/user-data" "$HOME/Library/Rime"
 
 echo "==> Build and reload"
 cd "$BASE/user-data"
-"$HOME/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel" --build
+if ! "$HOME/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel" --build; then
+  echo "Squirrel ${SQUIRREL_VERSION} failed to launch on macOS ${MACOS_VERSION}." >&2
+  echo "Try upgrading macOS, or install a different Squirrel release manually." >&2
+  exit 1
+fi
 "$HOME/Library/Input Methods/Squirrel.app/Contents/MacOS/Squirrel" --reload
 "$BASE/scripts/reload_and_select_squirrel.sh"
 
