@@ -7,8 +7,9 @@ patch:
     - radical_pinyin
     - fr
 
-  # Default to US/ASCII punctuation. Tap Shift or Control+Shift+3 to toggle Chinese punctuation.
+  # Default to US/ASCII punctuation. Tap Shift briefly or press Control+Shift+3 to toggle punctuation.
   switches/@1/reset: 1
+  shift_punct_toggle/tap_threshold_ms: 300
 
   engine/processors:
     - lua_processor@*shift_punct_toggle

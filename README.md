@@ -8,7 +8,7 @@
 
 - 这是 Rime / 鼠须管配置发行版，不是新的输入法内核；优先通过 `user-data/*.custom.yaml`、`user-data/lua/`、词库和安装脚本扩展行为。
 - 日常混输保持在 Rime 的“中”模式：中文、英文、法语候选都在同一个候选窗里；需要纯英文模式时用 `F4` 切换，或直接切到 macOS 的 ABC 输入法。
-- 符号层默认是美式键盘标准。单击左/右 Shift 切换中/英符号层；长按 Shift 仍用于大写和上档输入。不依赖外部改键软件。
+- 符号层默认是美式键盘标准。短按左/右 Shift 切换中/英符号层；长按 Shift 单独释放不切换，和其他键组合时仍用于大写和上档输入。不依赖外部改键软件。
 - 键盘兼容目标是 MacBook 原装键盘和 68 键外接键盘同时可用：MacBook 用 `` Shift+` `` 输入 `~`，68 键键盘用 `Fn+Shift+Esc` 输入 `~`。
 - 个人学习数据适合同步到自己的电脑，但不适合公开提交：`user-data/*.userdb/`、`user-data/english_learning.tsv`、`user-data/user.yaml`、`user-data/installation.yaml`、`user-data/build/` 应保持私有或由本机生成。
 - 每次改输入行为，都同步更新根目录 `README.md` 和“只有 README 时在线安装”脚本；文档要写清楚默认状态、切换键、示例输出、依赖项和复刻命令。
@@ -21,7 +21,7 @@
 - 离线中英互译注释：英文候选显示短中文释义，中文词组显示短英文释义。
 - 编程词库：加入 THUOCL IT 中文词库和一批常用英文开发术语。
 - 英文回车学习：回车提交纯英文输入时记录词频，之后同码英文候选会按使用习惯前移。
-- 标点层可切换：默认是美式符号层；单击左/右 Shift 或 `Control+Shift+3` 切换中/英符号层，68 键外接键盘支持 `Fn+Shift+Esc` 输出波浪号。
+- 标点层可切换：默认是美式符号层；短按左/右 Shift 或 `Control+Shift+3` 切换中/英符号层，68 键外接键盘支持 `Fn+Shift+Esc` 输出波浪号。
 - 双键盘适配：MacBook 原装键盘和 68 键外接键盘都按同一套中/英符号层规则工作。
 - 系统配色高亮：鼠须管主题显式使用当前 macOS 选中背景色，避免候选高亮经过内置主题偏色。
 - 可迁移与同步：`~/Library/Rime` 链接到本文件夹的 `user-data/`，配置、词库、用户词频和状态文件都可以跟着这个文件夹走。
@@ -58,7 +58,7 @@
 
 - 只有 README：走下面的“只有 README 时在线安装”，会联网下载上游项目并生成一套干净的新配置。
 - 有完整文件夹：走“带着整个文件夹迁移安装”，把 `~/Library/Rime` 链接到这个文件夹的 `user-data/`。
-- 要切换中/英符号层：单击左/右 Shift；备用键是 Rime 内置的 `Control+Shift+3`。
+- 要切换中/英符号层：短按左/右 Shift；备用键是 Rime 内置的 `Control+Shift+3`。
 - 要同步个人习惯：同步 `user-data/rime_ice.userdb/` 和 `user-data/english_learning.tsv`，另一台电脑会继承中文候选学习和英文回车学习。
 - 要公开开源：不要提交 `user-data/*.userdb/`、`user-data/english_learning.tsv`、`user-data/user.yaml`、`user-data/installation.yaml` 和 `user-data/build/`。
 
@@ -68,7 +68,7 @@
 
 | 操作 | 美式符号层 | 中文符号层 |
 | --- | --- | --- |
-| 单击左/右 Shift | 切到中文符号层 | 切回美式符号层 |
+| 短按左/右 Shift | 切到中文符号层 | 切回美式符号层 |
 | `Control+Shift+3` | 切到中文符号层 | 切回美式符号层 |
 | `Shift+,` / `Shift+.` | `<` / `>` | `《` / `》` |
 | `Shift+[` / `Shift+]` | `{` / `}` | `「` / `」` |
@@ -497,8 +497,9 @@ patch:
     - radical_pinyin
     - fr
 
-  # 默认使用美式键盘标点；单击 Shift 或 Control+Shift+3 切换中/英符号层。
+  # 默认使用美式键盘标点；短按 Shift 或 Control+Shift+3 切换中/英符号层。
   switches/@1/reset: 1
+  shift_punct_toggle/tap_threshold_ms: 300
 
   engine/processors:
     - lua_processor@*shift_punct_toggle
@@ -677,15 +678,31 @@ mkdir -p "$BASE/user-data/lua" "$BASE/user-data/translations"
 cat > "$BASE/user-data/lua/shift_punct_toggle.lua" <<'LUA'
 local processor = {}
 
--- Tap Shift to toggle ASCII/Chinese punctuation, while preserving normal
--- Shift chords such as Shift+comma and Shift+letters.
+-- Tap Shift briefly to toggle ASCII/Chinese punctuation, while preserving
+-- normal Shift chords such as Shift+comma and Shift+letters. Holding Shift
+-- alone past the tap threshold does nothing.
+local default_tap_threshold_ms = 300
+
 local shift_keys = {
     Shift_L = true,
     Shift_R = true,
 }
 
+local function now_ms()
+    if rime_api and rime_api.get_time_ms then
+        return rime_api.get_time_ms()
+    end
+    return os.time() * 1000
+end
+
 local function toggle_ascii_punct(context)
     context:set_option("ascii_punct", not context:get_option("ascii_punct"))
+end
+
+function processor.init(env)
+    local config = env.engine.schema.config
+    local threshold = config:get_int("shift_punct_toggle/tap_threshold_ms")
+    env.tap_threshold_ms = threshold and threshold > 0 and threshold or default_tap_threshold_ms
 end
 
 function processor.func(key, env)
@@ -698,19 +715,39 @@ function processor.func(key, env)
 
     if shift_keys[repr] then
         if key:release() then
-            if env.shift_pending and not env.shift_used then
-                toggle_ascii_punct(context)
-                env.shift_pending = false
-                env.shift_used = false
-                return 1
-            end
+            local was_pending = env.shift_pending
+            local was_used = env.shift_used
+            local is_shift_tap = env.shift_pending
+                and not env.shift_used
+                and env.shift_pressed_at
+                and now_ms() - env.shift_pressed_at <= (env.tap_threshold_ms or default_tap_threshold_ms)
+
             env.shift_pending = false
             env.shift_used = false
+            env.shift_pressed_at = nil
+            env.shift_key = nil
+
+            if is_shift_tap then
+                toggle_ascii_punct(context)
+                return 1
+            end
+
+            if was_pending and not was_used then
+                return 1
+            end
+
             return 2
         end
 
-        env.shift_pending = true
-        env.shift_used = false
+        if not env.shift_pending then
+            env.shift_pending = true
+            env.shift_used = false
+            env.shift_pressed_at = now_ms()
+            env.shift_key = repr
+        elseif env.shift_key ~= repr then
+            env.shift_used = true
+        end
+
         return 2
     end
 
@@ -1652,11 +1689,11 @@ cd "$BASE/user-data"
    - `francais` 可以出 `français`，法语候选会带 `〔FR〕` 标记。
 4. 按 `F4` 可以打开 Rime 方案选单和开关。
 
-中英法混输需要保持在 Rime 的“中”模式。当前已关闭 `Shift` 切换纯英文 ASCII 模式；单击左/右 Shift 用来切换中/英符号层，备用键是 Rime 内置的 `Control+Shift+3`。需要纯英文模式时，可以按 `F4` 在方案选单里切换“中 / Ａ”，或直接切到 macOS 的 ABC 输入法。
+中英法混输需要保持在 Rime 的“中”模式。当前已关闭 `Shift` 切换纯英文 ASCII 模式；短按左/右 Shift 用来切换中/英符号层，备用键是 Rime 内置的 `Control+Shift+3`。需要纯英文模式时，可以按 `F4` 在方案选单里切换“中 / Ａ”，或直接切到 macOS 的 ABC 输入法。
 
 ## 标点与英文学习
 
-默认是美式符号层；单击左/右 Shift 切到中文符号层，再单击一次切回美式。备用切换键是 `Control+Shift+3`。两个符号层都保留键盘本身的两层结构：不按 `Shift` 是基础层，长按 `Shift` 是上档层。
+默认是美式符号层；短按左/右 Shift 切到中文符号层，再短按一次切回美式。备用切换键是 `Control+Shift+3`。两个符号层都保留键盘本身的两层结构：不按 `Shift` 是基础层，长按 `Shift` 与其他键组合是上档层；长按 Shift 单独释放不切换。
 
 美式符号层：
 
@@ -1675,11 +1712,11 @@ cd "$BASE/user-data"
 - `Shift+'` 输出中文双引号 `“”`。
 - `Shift+\`` 或 68 键键盘的 `Fn+Shift+Esc` 输出中文全角波浪号 `～`。
 
-`'` 在 Rime 里也可作拼音分隔符，所以这里用 `user-data/lua/code_punctuation.lua` 在没有正在输入拼音时优先上屏单引号。需要大量输入代码符号时，保持美式符号层即可；需要中文书名号、中文括号时，单击 Shift 临时切到中文符号层。
+`'` 在 Rime 里也可作拼音分隔符，所以这里用 `user-data/lua/code_punctuation.lua` 在没有正在输入拼音时优先上屏单引号。需要大量输入代码符号时，保持美式符号层即可；需要中文书名号、中文括号时，短按 Shift 临时切到中文符号层。
 
 ### 轻量切换策略
 
-当前不安装外部改键软件。单击左/右 Shift 由 `user-data/lua/shift_punct_toggle.lua` 切换 Rime 的 `ascii_punct`，用于切换数字键区和符号区的中/英符号层；长按 Shift 仍用于大写和上档符号。
+当前不安装外部改键软件。短按左/右 Shift 由 `user-data/lua/shift_punct_toggle.lua` 切换 Rime 的 `ascii_punct`，用于切换数字键区和符号区的中/英符号层；默认短按阈值是 `300ms`，可在 `user-data/rime_ice.custom.yaml` 的 `shift_punct_toggle/tap_threshold_ms` 调整。长按 Shift 单独释放不切换，和其他键组合时仍用于大写和上档符号。
 
 中/英符号层切换统一使用 Rime 原生快捷键：
 
@@ -1688,7 +1725,7 @@ Shift_L / Shift_R
 Control+Shift+3
 ```
 
-这条配置走 Rime Lua 处理器，不依赖 Karabiner。若某个 macOS / Squirrel 版本无法把纯 Shift 单击交给 Rime，可从 `user-data/rime_ice.custom.yaml` 移除 `lua_processor@*shift_punct_toggle`，回到只用 `Control+Shift+3` 的稳定方案。
+这条配置走 Rime Lua 处理器，不依赖 Karabiner。若某个 macOS / Squirrel 版本无法把纯 Shift 短按交给 Rime，可从 `user-data/rime_ice.custom.yaml` 移除 `lua_processor@*shift_punct_toggle`，回到只用 `Control+Shift+3` 的稳定方案。
 
 纯英文输入的学习规则：
 
