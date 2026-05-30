@@ -2,8 +2,13 @@ local store = require("english_learning_store")
 
 local processor = {}
 
-function processor.init()
+function processor.init(env)
     store.init()
+    store.configure(env.engine.schema.config)
+end
+
+function processor.fini()
+    store.flush()
 end
 
 function processor.func(key, env)

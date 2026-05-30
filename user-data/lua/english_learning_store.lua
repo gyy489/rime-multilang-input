@@ -2,6 +2,11 @@ local M = {
     loaded = false,
     counts = {},
     path = nil,
+    dirty = false,
+    dirty_count = 0,
+    last_save_at = 0,
+    save_every = 5,
+    save_interval_seconds = 15,
 }
 
 local function trim(text)
@@ -44,15 +49,29 @@ function M.init()
         file:close()
     end
 
+    M.last_save_at = os.time()
     M.loaded = true
 end
 
+function M.configure(config)
+    local save_every = config:get_int("english_learning/save_every")
+    if save_every and save_every > 0 then
+        M.save_every = save_every
+    end
+
+    local save_interval_seconds = config:get_int("english_learning/save_interval_seconds")
+    if save_interval_seconds and save_interval_seconds > 0 then
+        M.save_interval_seconds = save_interval_seconds
+    end
+end
+
 function M.save()
-    if not M.path then
+    if not M.path or not M.dirty then
         return
     end
 
-    local file = io.open(M.path, "w")
+    local tmp_path = M.path .. ".tmp"
+    local file = io.open(tmp_path, "w")
     if not file then
         return
     end
@@ -64,6 +83,21 @@ function M.save()
         end
     end
     file:close()
+
+    local ok = os.rename(tmp_path, M.path)
+    if not ok then
+        os.remove(tmp_path)
+        return
+    end
+
+    M.dirty = false
+    M.dirty_count = 0
+    M.last_save_at = os.time()
+end
+
+function M.flush()
+    M.init()
+    M.save()
 end
 
 function M.increment(text)
@@ -75,7 +109,14 @@ function M.increment(text)
     end
 
     M.counts[key] = (M.counts[key] or 0) + 1
-    M.save()
+    M.dirty = true
+    M.dirty_count = M.dirty_count + 1
+
+    local now = os.time()
+    if M.dirty_count >= M.save_every or now - M.last_save_at >= M.save_interval_seconds then
+        M.save()
+    end
+
     return key, M.counts[key]
 end
 

@@ -13,6 +13,7 @@ patch:
 
   engine/processors:
     - lua_processor@*shift_punct_toggle
+    - lua_processor@*shift_letter_commit
     - lua_processor@*select_character
     - ascii_composer
     - recognizer
@@ -78,5 +79,8 @@ patch:
   english_learning:
     scan_limit: 20
     promote_to_first_at: 5
+    save_every: 5
+    save_interval_seconds: 15
 
   translation_comment/enabled: true
+  force_gc/interval: 8

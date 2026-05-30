@@ -8,6 +8,15 @@ local function pass_all(input)
     end
 end
 
+local function candidate_iter(input)
+    local iter, state, var = input:iter()
+    return function()
+        local cand = iter(state, var)
+        var = cand
+        return cand
+    end
+end
+
 local function is_exact_english(cand, key)
     return cand.text and cand.text:lower() == key and cand.text:match("^[A-Za-z]+$")
 end
@@ -16,8 +25,13 @@ function M.init(env)
     store.init()
 
     local config = env.engine.schema.config
+    store.configure(config)
     M.scan_limit = config:get_int("english_learning/scan_limit") or 20
     M.promote_to_first_at = config:get_int("english_learning/promote_to_first_at") or 5
+end
+
+function M.fini()
+    store.flush()
 end
 
 function M.func(input, env)
@@ -34,13 +48,13 @@ function M.func(input, env)
     end
 
     local head = {}
-    local tail = {}
-    for cand in input:iter() do
-        if #head < M.scan_limit then
-            table.insert(head, cand)
-        else
-            table.insert(tail, cand)
+    local iter = candidate_iter(input)
+    for _ = 1, M.scan_limit do
+        local cand = iter()
+        if not cand then
+            break
         end
+        table.insert(head, cand)
     end
 
     local english_index = nil
@@ -64,7 +78,11 @@ function M.func(input, env)
         yield(cand)
     end
 
-    for _, cand in ipairs(tail) do
+    while true do
+        local cand = iter()
+        if not cand then
+            break
+        end
         yield(cand)
     end
 end
