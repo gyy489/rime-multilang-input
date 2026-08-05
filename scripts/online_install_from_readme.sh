@@ -90,6 +90,118 @@ if line not in text:
 path.write_text(text, encoding='utf-8')
 PY
 
+echo "==> Enable fuzzy-spelling tolerance (Chinese pinyin / English)"
+python3 - "$BASE/user-data/rime_ice.schema.yaml" <<'PY'
+from pathlib import Path
+path = Path(__import__('sys').argv[1])
+text = path.read_text(encoding='utf-8')
+old = """    ### 模糊音
+    # 声母
+    # - derive/^([zcs])h/$1/          # zh* ch* sh* 派生出 z* c* s*
+    # - derive/^([zcs])([^h])/$1h$2/  # z* c* s*    派生出 zh* ch* sh*
+    # - derive/^l/n/  # 解释：为 l 开头的拼写派生出 n 开头，即 nai 也可以输出 lai（来、莱、赖……）
+    # - derive/^n/l/  #      lai 可输出 nai（奶、乃、奈……）。 可以单向或成对儿启用模糊音
+    # - derive/^f/h/
+    # - derive/^h/f/
+    # - derive/^l/r/
+    # - derive/^r/l/
+    # - derive/^g/k/
+    # - derive/^k/g/
+    # 韵母
+    # - derive/ang$/an/
+    # - derive/an$/ang/
+    # - derive/eng$/en/
+    # - derive/en$/eng/
+    # - derive/in$/ing/
+    # - derive/ing$/in/
+    # - derive/ian$/iang/
+    # - derive/iang$/ian/
+    # - derive/uan$/uang/
+    # - derive/uang$/uan/
+    # - derive/ai$/an/
+    # - derive/an$/ai/
+    # - derive/ong$/un/
+    # - derive/un$/ong/
+    # - derive/ong$/on/
+    # - derive/iong$/un/
+    # - derive/un$/iong/
+    # - derive/ong$/eng/
+    # - derive/eng$/ong/
+    # 拼音音节
+    # - derive/^fei$/hui/
+    # - derive/^hui$/fei/
+    # - derive/^hu$/fu/
+    # - derive/^fu$/hu/
+    # - derive/^wang$/huang/
+    # - derive/^huang$/wang/
+"""
+new = """    ### 模糊音（打字/口音容错，常用组合默认启用，可按需注释关闭）
+    # 声母
+    - derive/^([zcs])h/$1/          # zh* ch* sh* 派生出 z* c* s*
+    - derive/^([zcs])([^h])/$1h$2/  # z* c* s*    派生出 zh* ch* sh*
+    - derive/^l/n/  # 解释：为 l 开头的拼写派生出 n 开头，即 nai 也可以输出 lai（来、莱、赖……）
+    - derive/^n/l/  #      lai 可输出 nai（奶、乃、奈……）。 可以单向或成对儿启用模糊音
+    - derive/^f/h/
+    - derive/^h/f/
+    - derive/^l/r/
+    - derive/^r/l/
+    # - derive/^g/k/
+    # - derive/^k/g/
+    # 韵母
+    - derive/ang$/an/
+    - derive/an$/ang/
+    - derive/eng$/en/
+    - derive/en$/eng/
+    - derive/in$/ing/
+    - derive/ing$/in/
+    - derive/ian$/iang/
+    - derive/iang$/ian/
+    - derive/uan$/uang/
+    - derive/uang$/uan/
+    # - derive/ai$/an/
+    # - derive/an$/ai/
+    - derive/ong$/un/
+    - derive/un$/ong/
+    - derive/ong$/on/
+    - derive/iong$/un/
+    - derive/un$/iong/
+    - derive/ong$/eng/
+    - derive/eng$/ong/
+    # 拼音音节
+    - derive/^fei$/hui/
+    - derive/^hui$/fei/
+    - derive/^hu$/fu/
+    - derive/^fu$/hu/
+    - derive/^wang$/huang/
+    - derive/^huang$/wang/
+"""
+if new not in text:
+    text = text.replace(old, new, 1)
+path.write_text(text, encoding='utf-8')
+PY
+
+python3 - "$BASE/user-data/melt_eng.schema.yaml" <<'PY'
+from pathlib import Path
+path = Path(__import__('sys').argv[1])
+text = path.read_text(encoding='utf-8')
+lines = (
+    '  # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）\n'
+    '  - derive/^([a-zA-Z])([a-zA-Z])/$2$1/\n'
+    '  # 拼写容错：常见字母混淆\n'
+    '  - derive/ie/ei/\n'
+    '  - derive/ei/ie/\n'
+    '  # 拼写容错：重复字母误输入为单个字母（如 occurred -> occured）\n'
+    '  - derive/ll/l/\n'
+    '  - derive/ss/s/\n'
+    '  - derive/tt/t/\n'
+    '  - derive/ee/e/\n'
+)
+if lines not in text:
+    marker = '  - erase/^[^a-zA-Z0-9].+$/\n'
+    text = text.replace(marker, marker + lines, 1)
+path.write_text(text, encoding='utf-8')
+PY
+
 mkdir -p "$BASE/user-data/en_dicts"
 cat > "$BASE/user-data/en_dicts/dev.dict.yaml" <<'YAML'
 # Rime dictionary
@@ -497,6 +609,14 @@ engine:
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
   delimiter: " '"
+  algebra:
+    # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）
+    - derive/^([a-z])([a-z])/$2$1/
+    # 拼写容错：重复字母误输入为单个字母
+    - derive/ll/l/
+    - derive/ss/s/
+    - derive/tt/t/
+    - derive/ee/e/
 
 translator:
   dictionary: fr

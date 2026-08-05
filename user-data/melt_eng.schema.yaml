@@ -117,6 +117,16 @@ algebra_common:
   - derive/[^a-zA-Z0-9]//
   # 禁用非英文、数字开头的编码
   - erase/^[^a-zA-Z0-9].+$/
+  # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）
+  - derive/^([a-zA-Z])([a-zA-Z])/$2$1/
+  # 拼写容错：常见字母混淆
+  - derive/ie/ei/
+  - derive/ei/ie/
+  # 拼写容错：重复字母误输入为单个字母（如 occurred -> occured）
+  - derive/ll/l/
+  - derive/ss/s/
+  - derive/tt/t/
+  - derive/ee/e/
   # 全小写
   - derive/^.+$/\L$0/
   # 全大写
