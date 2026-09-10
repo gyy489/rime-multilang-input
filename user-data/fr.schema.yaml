@@ -38,7 +38,8 @@ speller:
   alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
   delimiter: " '"
   algebra:
-    # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）
+    # 仅保留轻量容错，避免法语候选因模糊匹配过多而扩散。
+    # 词头相邻字母互换（只做一处，避免索引膨胀）
     - derive/^([a-z])([a-z])/$2$1/
     # 拼写容错：重复字母误输入为单个字母
     - derive/ll/l/

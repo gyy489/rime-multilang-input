@@ -117,16 +117,59 @@ algebra_common:
   - derive/[^a-zA-Z0-9]//
   # 禁用非英文、数字开头的编码
   - erase/^[^a-zA-Z0-9].+$/
-  # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）
+  # 高容错英语拼写：支持词头换位、常见字母顺序错误和重复字母遗漏。
   - derive/^([a-zA-Z])([a-zA-Z])/$2$1/
-  # 拼写容错：常见字母混淆
+  # 常见的相邻字母顺序错误。
   - derive/ie/ei/
   - derive/ei/ie/
-  # 拼写容错：重复字母误输入为单个字母（如 occurred -> occured）
-  - derive/ll/l/
-  - derive/ss/s/
-  - derive/tt/t/
-  - derive/ee/e/
+  - derive/he/eh/
+  - derive/er/re/
+  - derive/re/er/
+  - derive/an/na/
+  - derive/na/an/
+  - derive/on/no/
+  - derive/no/on/
+  # 重复字母误输入为单个字母（如 occurred -> occured）。
+  - derive/([aeiou])\1/$1/
+  - derive/([b-df-hj-np-tv-z])\1/$1/
+  # 漏掉常见词尾：make -> mak、running -> runnin、played -> playd。
+  - derive/e$//
+  - derive/ing$/in/
+  - derive/ed$/d/
+  # 高频整词拼写错误。每条都从正确词形派生，不影响原始正确输入。
+  - derive/accommodate/accomodate/
+  - derive/address/adress/
+  - derive/agreement/agrement/
+  - derive/beginning/begining/
+  - derive/calendar/calender/
+  - derive/definitely/definately/
+  - derive/definitely/definitly/
+  - derive/development/developement/
+  - derive/environment/enviroment/
+  - derive/government/goverment/
+  - derive/grammar/grammer/
+  - derive/independent/independant/
+  - derive/knowledge/knowlege/
+  - derive/necessary/neccessary/
+  - derive/necessary/necesary/
+  - derive/occurred/occured/
+  - derive/separate/seperate/
+  - derive/successful/sucessful/
+  - derive/tomorrow/tommorow/
+  - derive/whether/wether/
+  - derive/business/buisness/
+  - derive/because/becuase/
+  - derive/which/wich/
+  - derive/probably/probabaly/
+  - derive/recommend/recomend/
+  - derive/privilege/privelege/
+  - derive/embarrass/embarass/
+  - derive/argument/arguement/
+  - derive/maintenance/maintainance/
+  - derive/library/libary/
+  - derive/publicly/publically/
+  - derive/really/realy/
+  - derive/succeed/suceed/
   # 全小写
   - derive/^.+$/\L$0/
   # 全大写

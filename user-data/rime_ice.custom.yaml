@@ -72,7 +72,7 @@ patch:
     enable_completion: true
     enable_sentence: false
     enable_user_dict: true
-    initial_quality: 1.35
+    initial_quality: 1.6
     comment_format:
       - xform/^.+$//
 
@@ -81,6 +81,9 @@ patch:
     promote_to_first_at: 5
     save_every: 5
     save_interval_seconds: 15
+
+  # 英文不再因与拼音短码重合被强制后移；让它更常进入前排候选。
+  reduce_english_filter/mode: none
 
   translation_comment/enabled: true
   force_gc/interval: 8

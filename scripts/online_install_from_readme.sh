@@ -90,7 +90,7 @@ if line not in text:
 path.write_text(text, encoding='utf-8')
 PY
 
-echo "==> Enable fuzzy-spelling tolerance (Chinese pinyin / English)"
+echo "==> Configure light Chinese / French fuzziness and high English typo tolerance"
 python3 - "$BASE/user-data/rime_ice.schema.yaml" <<'PY'
 from pathlib import Path
 path = Path(__import__('sys').argv[1])
@@ -135,48 +135,21 @@ old = """    ### 模糊音
     # - derive/^wang$/huang/
     # - derive/^huang$/wang/
 """
-new = """    ### 模糊音（打字/口音容错，常用组合默认启用，可按需注释关闭）
+new = """    ### 轻量模糊音（仅保留平翘舌；避免中文候选因过度容错而扩散）
     # 声母
     - derive/^([zcs])h/$1/          # zh* ch* sh* 派生出 z* c* s*
     - derive/^([zcs])([^h])/$1h$2/  # z* c* s*    派生出 zh* ch* sh*
-    - derive/^l/n/  # 解释：为 l 开头的拼写派生出 n 开头，即 nai 也可以输出 lai（来、莱、赖……）
-    - derive/^n/l/  #      lai 可输出 nai（奶、乃、奈……）。 可以单向或成对儿启用模糊音
-    - derive/^f/h/
-    - derive/^h/f/
-    - derive/^l/r/
-    - derive/^r/l/
-    # - derive/^g/k/
-    # - derive/^k/g/
-    # 韵母
-    - derive/ang$/an/
-    - derive/an$/ang/
-    - derive/eng$/en/
-    - derive/en$/eng/
-    - derive/in$/ing/
-    - derive/ing$/in/
-    - derive/ian$/iang/
-    - derive/iang$/ian/
-    - derive/uan$/uang/
-    - derive/uang$/uan/
-    # - derive/ai$/an/
-    # - derive/an$/ai/
-    - derive/ong$/un/
-    - derive/un$/ong/
-    - derive/ong$/on/
-    - derive/iong$/un/
-    - derive/un$/iong/
-    - derive/ong$/eng/
-    - derive/eng$/ong/
-    # 拼音音节
-    - derive/^fei$/hui/
-    - derive/^hui$/fei/
-    - derive/^hu$/fu/
-    - derive/^fu$/hu/
-    - derive/^wang$/huang/
-    - derive/^huang$/wang/
 """
 if new not in text:
     text = text.replace(old, new, 1)
+lines = text.splitlines(keepends=True)
+in_auto_correct = False
+for index, line in enumerate(lines):
+    if line.strip() == "### 自动纠错":
+        in_auto_correct = True
+    elif in_auto_correct and line.startswith("    - derive/"):
+        lines[index] = "    # " + line.lstrip()
+text = "".join(lines)
 path.write_text(text, encoding='utf-8')
 PY
 
@@ -185,16 +158,59 @@ from pathlib import Path
 path = Path(__import__('sys').argv[1])
 text = path.read_text(encoding='utf-8')
 lines = (
-    '  # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）\n'
+    '  # 高容错英语拼写：支持词头换位、常见字母顺序错误和重复字母遗漏。\n'
     '  - derive/^([a-zA-Z])([a-zA-Z])/$2$1/\n'
-    '  # 拼写容错：常见字母混淆\n'
+    '  # 常见的相邻字母顺序错误。\n'
     '  - derive/ie/ei/\n'
     '  - derive/ei/ie/\n'
-    '  # 拼写容错：重复字母误输入为单个字母（如 occurred -> occured）\n'
-    '  - derive/ll/l/\n'
-    '  - derive/ss/s/\n'
-    '  - derive/tt/t/\n'
-    '  - derive/ee/e/\n'
+    '  - derive/he/eh/\n'
+    '  - derive/er/re/\n'
+    '  - derive/re/er/\n'
+    '  - derive/an/na/\n'
+    '  - derive/na/an/\n'
+    '  - derive/on/no/\n'
+    '  - derive/no/on/\n'
+    '  # 重复字母误输入为单个字母（如 occurred -> occured）。\n'
+    '  - derive/([aeiou])\\1/$1/\n'
+    '  - derive/([b-df-hj-np-tv-z])\\1/$1/\n'
+    '  # 漏掉常见词尾：make -> mak、running -> runnin、played -> playd。\n'
+    '  - derive/e$//\n'
+    '  - derive/ing$/in/\n'
+    '  - derive/ed$/d/\n'
+    '  # 高频整词拼写错误。每条都从正确词形派生，不影响原始正确输入。\n'
+    '  - derive/accommodate/accomodate/\n'
+    '  - derive/address/adress/\n'
+    '  - derive/agreement/agrement/\n'
+    '  - derive/beginning/begining/\n'
+    '  - derive/calendar/calender/\n'
+    '  - derive/definitely/definately/\n'
+    '  - derive/definitely/definitly/\n'
+    '  - derive/development/developement/\n'
+    '  - derive/environment/enviroment/\n'
+    '  - derive/government/goverment/\n'
+    '  - derive/grammar/grammer/\n'
+    '  - derive/independent/independant/\n'
+    '  - derive/knowledge/knowlege/\n'
+    '  - derive/necessary/neccessary/\n'
+    '  - derive/necessary/necesary/\n'
+    '  - derive/occurred/occured/\n'
+    '  - derive/separate/seperate/\n'
+    '  - derive/successful/sucessful/\n'
+    '  - derive/tomorrow/tommorow/\n'
+    '  - derive/whether/wether/\n'
+    '  - derive/business/buisness/\n'
+    '  - derive/because/becuase/\n'
+    '  - derive/which/wich/\n'
+    '  - derive/probably/probabaly/\n'
+    '  - derive/recommend/recomend/\n'
+    '  - derive/privilege/privelege/\n'
+    '  - derive/embarrass/embarass/\n'
+    '  - derive/argument/arguement/\n'
+    '  - derive/maintenance/maintainance/\n'
+    '  - derive/library/libary/\n'
+    '  - derive/publicly/publically/\n'
+    '  - derive/really/realy/\n'
+    '  - derive/succeed/suceed/\n'
 )
 if lines not in text:
     marker = '  - erase/^[^a-zA-Z0-9].+$/\n'
@@ -558,13 +574,16 @@ patch:
     enable_completion: true
     enable_sentence: false
     enable_user_dict: true
-    initial_quality: 1.35
+    initial_quality: 1.6
     comment_format:
       - xform/^.+$//
 
   english_learning:
     scan_limit: 20
     promote_to_first_at: 5
+
+  # 英文不再因与拼音短码重合被强制后移；让它更常进入前排候选。
+  reduce_english_filter/mode: none
 
   translation_comment/enabled: true
 YAML
@@ -610,7 +629,8 @@ speller:
   alphabet: zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA
   delimiter: " '"
   algebra:
-    # 拼写容错：词头相邻字母互换（打字手误最常见的模式，只做一处避免索引膨胀）
+    # 仅保留轻量容错，避免法语候选因模糊匹配过多而扩散。
+    # 词头相邻字母互换（只做一处，避免索引膨胀）
     - derive/^([a-z])([a-z])/$2$1/
     # 拼写容错：重复字母误输入为单个字母
     - derive/ll/l/
@@ -1482,40 +1502,245 @@ cat > "$BASE/scripts/reload_and_select_squirrel.sh" <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
 
-app="$HOME/Library/Input Methods/Squirrel.app"
+usage() {
+  cat <<'USAGE'
+Usage: reload_and_select_squirrel.sh [--wait[=seconds]] [--build]
+
+Reload Squirrel, enable the Simplified Chinese input source, and select it.
+
+Options:
+  --wait[=seconds]  wait for ~/Library/Rime to become available before reload
+                    (default: 120 seconds when no value is provided)
+  --build           build schemas from the Rime user directory before reload
+USAGE
+}
+
+wait_seconds=0
+build_first=0
+source_id="${RIME_INPUT_SOURCE_ID:-im.rime.inputmethod.Squirrel.Hans}"
+
+for arg in "$@"; do
+  case "$arg" in
+    --wait)
+      wait_seconds="${RIME_WAIT_SECONDS:-120}"
+      ;;
+    --wait=*)
+      wait_seconds="${arg#*=}"
+      ;;
+    --build)
+      build_first=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if ! [[ "$wait_seconds" =~ ^[0-9]+$ ]]; then
+  echo "Wait seconds must be a non-negative integer: $wait_seconds" >&2
+  exit 2
+fi
+
+find_squirrel_app() {
+  local candidate
+  for candidate in \
+    "$HOME/Library/Input Methods/Squirrel.app" \
+    "/Library/Input Methods/Squirrel.app"
+  do
+    if [[ -x "$candidate/Contents/MacOS/Squirrel" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+wait_for_rime_dir() {
+  local rime_dir="${RIME_USER_DIR:-$HOME/Library/Rime}"
+  local elapsed=0
+  local target
+
+  while [[ ! -d "$rime_dir" ]]; do
+    if (( wait_seconds == 0 || elapsed >= wait_seconds )); then
+      if [[ -L "$rime_dir" ]]; then
+        target="$(readlink "$rime_dir")"
+        echo "Rime user directory is unavailable: $rime_dir -> $target" >&2
+      else
+        echo "Rime user directory is unavailable: $rime_dir" >&2
+      fi
+      return 1
+    fi
+
+    sleep 1
+    elapsed=$((elapsed + 1))
+  done
+
+  printf '%s\n' "$rime_dir"
+}
+
+source_is_selected() {
+  defaults read com.apple.HIToolbox AppleSelectedInputSources 2>/dev/null | grep -Fq "$source_id"
+}
+
+rime_dir="$(wait_for_rime_dir)"
+
+if ! app="$(find_squirrel_app)"; then
+  echo "Squirrel is not installed in ~/Library/Input Methods or /Library/Input Methods" >&2
+  exit 1
+fi
+
 bin="$app/Contents/MacOS/Squirrel"
 
-open "$app"
+open -g "$app"
+
+if (( build_first )); then
+  (cd "$rime_dir" && "$bin" --build)
+fi
+
 "$bin" --reload
+"$bin" --enable-input-source "$source_id"
+if ! source_is_selected; then
+  "$bin" --select-input-source "$source_id"
+fi
 
-swift - <<'SWIFT'
-import Carbon
-import Foundation
-
-let sourceID = "im.rime.inputmethod.Squirrel.Hans"
-let props = [kTISPropertyInputSourceID as String: sourceID] as CFDictionary
-
-guard
-  let array = TISCreateInputSourceList(props, false)?.takeRetainedValue() as NSArray?,
-  let sources = array as? [TISInputSource],
-  let source = sources.first
-else {
-  fputs("Cannot find input source: \(sourceID)\n", stderr)
-  exit(1)
-}
-
-let enableStatus = TISEnableInputSource(source)
-let selectStatus = TISSelectInputSource(source)
-
-if enableStatus != noErr || selectStatus != noErr {
-  fputs("Enable status: \(enableStatus), select status: \(selectStatus)\n", stderr)
-  exit(1)
-}
-
-print("Selected \(sourceID)")
-SWIFT
+echo "Selected $source_id"
 SH
 chmod +x "$BASE/scripts/reload_and_select_squirrel.sh"
+
+cat > "$BASE/scripts/install_squirrel_login_reload_agent.sh" <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+
+label="com.local.rime-squirrel-login-reload"
+uid="$(id -u)"
+agent_domain="gui/$uid"
+plist="$HOME/Library/LaunchAgents/$label.plist"
+runner_dir="$HOME/Library/Application Support/Rime输入法"
+runner="$runner_dir/reload-squirrel-at-login.sh"
+log_dir="$HOME/Library/Logs/Rime输入法"
+
+xml_escape() {
+  local value="$1"
+  value="${value//&/&amp;}"
+  value="${value//</&lt;}"
+  value="${value//>/&gt;}"
+  value="${value//\"/&quot;}"
+  value="${value//\'/&apos;}"
+  printf '%s' "$value"
+}
+
+uninstall() {
+  launchctl bootout "$agent_domain" "$plist" >/dev/null 2>&1 || true
+  rm -f "$plist" "$runner"
+  echo "Removed $label"
+}
+
+if [[ "${1:-}" == "--uninstall" ]]; then
+  uninstall
+  exit 0
+fi
+
+mkdir -p "$HOME/Library/LaunchAgents" "$runner_dir" "$log_dir"
+
+cat > "$runner" <<'RUNNER'
+#!/usr/bin/env bash
+set -euo pipefail
+
+wait_seconds="${RIME_LOGIN_WAIT_SECONDS:-180}"
+source_id="${RIME_INPUT_SOURCE_ID:-im.rime.inputmethod.Squirrel.Hans}"
+rime_dir="${RIME_USER_DIR:-$HOME/Library/Rime}"
+elapsed=0
+
+find_squirrel_app() {
+  local candidate
+  for candidate in \
+    "$HOME/Library/Input Methods/Squirrel.app" \
+    "/Library/Input Methods/Squirrel.app"
+  do
+    if [[ -x "$candidate/Contents/MacOS/Squirrel" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+source_is_selected() {
+  defaults read com.apple.HIToolbox AppleSelectedInputSources 2>/dev/null | grep -Fq "$source_id"
+}
+
+while [[ ! -d "$rime_dir" ]]; do
+  if (( elapsed >= wait_seconds )); then
+    if [[ -L "$rime_dir" ]]; then
+      echo "Rime user directory is unavailable after ${wait_seconds}s: $rime_dir -> $(readlink "$rime_dir")" >&2
+    else
+      echo "Rime user directory is unavailable after ${wait_seconds}s: $rime_dir" >&2
+    fi
+    exit 1
+  fi
+  sleep 1
+  elapsed=$((elapsed + 1))
+done
+
+if ! app="$(find_squirrel_app)"; then
+  echo "Squirrel is not installed in ~/Library/Input Methods or /Library/Input Methods" >&2
+  exit 1
+fi
+
+bin="$app/Contents/MacOS/Squirrel"
+
+open -g "$app"
+"$bin" --reload
+"$bin" --enable-input-source "$source_id"
+if ! source_is_selected; then
+  "$bin" --select-input-source "$source_id"
+fi
+
+echo "Selected $source_id"
+RUNNER
+chmod +x "$runner"
+
+runner_xml="$(xml_escape "$runner")"
+stdout_xml="$(xml_escape "$log_dir/squirrel-login-reload.out.log")"
+stderr_xml="$(xml_escape "$log_dir/squirrel-login-reload.err.log")"
+
+cat > "$plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$label</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$runner_xml</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>$stdout_xml</string>
+  <key>StandardErrorPath</key>
+  <string>$stderr_xml</string>
+</dict>
+</plist>
+PLIST
+
+launchctl bootout "$agent_domain" "$plist" >/dev/null 2>&1 || true
+launchctl bootstrap "$agent_domain" "$plist"
+launchctl enable "$agent_domain/$label"
+launchctl kickstart -k "$agent_domain/$label" >/dev/null 2>&1 || true
+
+echo "Installed $label"
+echo "Runner: $runner"
+echo "Logs: $log_dir/squirrel-login-reload.*.log"
+SH
+chmod +x "$BASE/scripts/install_squirrel_login_reload_agent.sh"
 
 echo "==> Link ~/Library/Rime"
 if [ -e "$HOME/Library/Rime" ] || [ -L "$HOME/Library/Rime" ]; then
@@ -1532,6 +1757,7 @@ if ! "$SQUIRREL_APP/Contents/MacOS/Squirrel" --build; then
 fi
 "$SQUIRREL_APP/Contents/MacOS/Squirrel" --reload
 "$BASE/scripts/reload_and_select_squirrel.sh"
+"$BASE/scripts/install_squirrel_login_reload_agent.sh"
 
 echo
 echo "Done. Log out and log back in, then add Squirrel in System Settings -> Keyboard -> Input Sources."
