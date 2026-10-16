@@ -53,7 +53,6 @@ patch:
     - lua_filter@*mixed_frequency_filter
     - lua_filter@*pin_cand_filter
     - lua_filter@*long_word_filter
-    - simplifier@emoji
     - simplifier@traditionalize
     - lua_filter@*search@radical_pinyin
     - lua_filter@*translation_comment

@@ -1,7 +1,6 @@
 -- 长词优先（提升「西安」「提案」「图案」「饥饿」等词汇的优先级）
 -- 感谢&参考于： https://github.com/tumuyan/rime-melt
 -- 不提升包含英文、数字的候选项
--- 不提升包含 emoji、假名的候选项（通过将此 Lua 放到 simplifier@emoji 前面来实现）
 
 local M = {}
 

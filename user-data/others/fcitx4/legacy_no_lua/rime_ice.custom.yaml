@@ -20,6 +20,5 @@ patch:
     - table_translator@radical_lookup
   engine/filters:
     - reverse_lookup_filter@radical_reverse_lookup
-    - simplifier@emoji
     - simplifier@traditionalize
     - uniquifier

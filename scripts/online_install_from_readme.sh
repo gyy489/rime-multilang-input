@@ -1742,10 +1742,11 @@ echo "Logs: $log_dir/squirrel-login-reload.*.log"
 SH
 chmod +x "$BASE/scripts/install_squirrel_login_reload_agent.sh"
 
-echo "==> Install frequency-weighted Chinese/English candidate ranking"
+echo "==> Install candidate ranking and disable Emoji"
 ranking_base="https://raw.githubusercontent.com/gyy489/rime-multilang-input/main"
 for ranking_file in \
   scripts/apply_english_frequency.py \
+  scripts/disable_emoji.py \
   sources/frequencywords/en_50k.txt \
   user-data/en_dicts/en.dict.yaml \
   user-data/lua/mixed_frequency_filter.lua \
@@ -1756,6 +1757,7 @@ do
   mkdir -p "$BASE/$(dirname "$ranking_file")"
   curl -fsSL --retry 3 -o "$BASE/$ranking_file" "$ranking_base/$ranking_file"
 done
+python3 "$BASE/scripts/disable_emoji.py" "$BASE/user-data"
 
 echo "==> Link ~/Library/Rime"
 if [ -e "$HOME/Library/Rime" ] || [ -L "$HOME/Library/Rime" ]; then
