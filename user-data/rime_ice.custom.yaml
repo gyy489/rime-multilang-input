@@ -48,10 +48,11 @@ patch:
     - reverse_lookup_filter@radical_reverse_lookup
     - lua_filter@*autocap_filter
     - lua_filter@*v_filter
-    - lua_filter@*pin_cand_filter
-    - lua_filter@*long_word_filter
     - lua_filter@*reduce_english_filter
     - lua_filter@*english_learning_filter
+    - lua_filter@*mixed_frequency_filter
+    - lua_filter@*pin_cand_filter
+    - lua_filter@*long_word_filter
     - simplifier@emoji
     - simplifier@traditionalize
     - lua_filter@*search@radical_pinyin
@@ -81,6 +82,12 @@ patch:
     promote_to_first_at: 5
     save_every: 5
     save_interval_seconds: 15
+
+  # 语言内保留词频顺序；高频候选用幂曲线加权，换语言可获得少量优先分。
+  mixed_frequency:
+    scan_limit: 120
+    power: 1.6
+    switch_bonus: 0.25
 
   # 英文不再因与拼音短码重合被强制后移；让它更常进入前排候选。
   reduce_english_filter/mode: none

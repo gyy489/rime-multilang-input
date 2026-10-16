@@ -46,6 +46,11 @@ func Sort(dictPath string, _type int) {
 			}
 			continue
 		}
+		// 英文词库的注释词条仍是两列，正文改为三列（含词频）。
+		if strings.Contains(dictPath, "en_dicts/en.dict.yaml") && strings.HasPrefix(line, "#") {
+			contents = append(contents, lemma{text: line})
+			continue
+		}
 
 		// 分割为 text code weight
 		parts := strings.Split(line, "\t")
@@ -212,7 +217,13 @@ func Sort(dictPath string, _type int) {
 			}
 		case 3:
 			for _, line := range contents {
-				_, err := file.WriteString(line.text + "\t" + line.code + "\t" + strconv.Itoa(line.weight) + "\n")
+				var output string
+				if strings.HasPrefix(line.text, "#") {
+					output = line.text + "\n"
+				} else {
+					output = line.text + "\t" + line.code + "\t" + strconv.Itoa(line.weight) + "\n"
+				}
+				_, err := file.WriteString(output)
 				if err != nil {
 					log.Fatalln(err)
 				}

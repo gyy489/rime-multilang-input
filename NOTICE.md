@@ -13,7 +13,7 @@ The repository-level license is GPL-3.0-only because the distributed configurati
 | rime-ice | Base Chinese schema and dictionaries | GPL-3.0-only |
 | ECDICT | English-to-Chinese translation comments | MIT |
 | CC-CEDICT | Chinese-to-English translation comments | CC BY-SA 4.0 |
-| FrequencyWords | French frequency dictionary source | Code: MIT; content: CC BY-SA 4.0 |
+| FrequencyWords | French dictionary source and English frequency weights | Code: MIT; content: CC BY-SA 4.0 |
 | THUOCL | IT / programming Chinese dictionary | MIT; upstream also asks users to cite THUOCL in academic use |
 
 ## Source Links

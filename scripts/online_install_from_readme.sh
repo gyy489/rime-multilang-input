@@ -1742,6 +1742,21 @@ echo "Logs: $log_dir/squirrel-login-reload.*.log"
 SH
 chmod +x "$BASE/scripts/install_squirrel_login_reload_agent.sh"
 
+echo "==> Install frequency-weighted Chinese/English candidate ranking"
+ranking_base="https://raw.githubusercontent.com/gyy489/rime-multilang-input/main"
+for ranking_file in \
+  scripts/apply_english_frequency.py \
+  sources/frequencywords/en_50k.txt \
+  user-data/en_dicts/en.dict.yaml \
+  user-data/lua/mixed_frequency_filter.lua \
+  user-data/others/script/main.go \
+  user-data/others/script/rime/sort.go \
+  user-data/rime_ice.custom.yaml
+do
+  mkdir -p "$BASE/$(dirname "$ranking_file")"
+  curl -fsSL --retry 3 -o "$BASE/$ranking_file" "$ranking_base/$ranking_file"
+done
+
 echo "==> Link ~/Library/Rime"
 if [ -e "$HOME/Library/Rime" ] || [ -L "$HOME/Library/Rime" ]; then
   mv "$HOME/Library/Rime" "$HOME/Library/Rime.backup.$(date +%Y%m%d-%H%M%S)"
