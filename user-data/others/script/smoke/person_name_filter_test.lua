@@ -6,7 +6,7 @@ local function candidate(text, comment)
     return { text = text, comment = comment or "" }
 end
 
-local function run(schema, candidates, scan_limit)
+local function run(schema, candidates, scan_limit, data_dir)
     local config = {
         get_int = function(_, key)
             if key == "person_name_filter/scan_limit" then return scan_limit end
@@ -27,6 +27,7 @@ local function run(schema, candidates, scan_limit)
             end
         end,
     }
+    rime_api.get_user_data_dir = function() return data_dir or "user-data" end
     filter.init(env)
     filter.func(input, env)
     return output
@@ -49,5 +50,9 @@ local bounded = { candidate("张伟"), candidate("天气"), candidate("王伟"),
 output = run("rime_ice", bounded, 2)
 assert(output[1] == bounded[2] and output[2] == bounded[1])
 assert(output[3] == bounded[3] and output[4] == bounded[4])
+
+local personal = { candidate("私人名字"), candidate("普通词") }
+output = run("rime_ice", personal, 2, "user-data/others/script/smoke/fixtures")
+assert(output[1] == personal[2] and output[2] == personal[1])
 
 print("person_name_filter: pass")

@@ -1,8 +1,7 @@
 -- 将已标记的人名放在普通候选之后，保留人名内部的原始顺序。
 local M = {}
 
-local function load_names(path)
-    local names = { cn = {}, en = {}, fr = {} }
+local function load_names(path, names)
     local file = io.open(path, "r")
     if not file then
         return names
@@ -32,7 +31,11 @@ function M.init(env)
     local config = env.engine.schema.config
     env.person_name_scan_limit = config:get_int("person_name_filter/scan_limit") or 300
     env.person_name_schema = config:get_string("schema/schema_id")
-    env.person_names = load_names(rime_api:get_user_data_dir() .. "/others/person_names.txt")
+    local data_dir = rime_api:get_user_data_dir()
+    local names = { cn = {}, en = {}, fr = {} }
+    load_names(data_dir .. "/others/person_names.txt", names)
+    load_names(data_dir .. "/others/person_names.local.txt", names)
+    env.person_names = names
 end
 
 function M.func(input, env)

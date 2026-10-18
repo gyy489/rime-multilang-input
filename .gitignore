@@ -9,6 +9,7 @@ user-data/build/
 user-data/installation.yaml
 user-data/user.yaml
 user-data/english_learning.tsv
+user-data/others/person_names.local.txt
 user-data/shift_debug.log
 user-data/sync/
 user-data/*.userdb/
