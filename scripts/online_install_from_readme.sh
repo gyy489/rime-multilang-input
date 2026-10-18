@@ -1742,7 +1742,7 @@ echo "Logs: $log_dir/squirrel-login-reload.*.log"
 SH
 chmod +x "$BASE/scripts/install_squirrel_login_reload_agent.sh"
 
-echo "==> Install candidate ranking and disable Emoji"
+echo "==> Install candidate ranking, lower person names, and disable Emoji"
 ranking_base="https://raw.githubusercontent.com/gyy489/rime-multilang-input/main"
 for ranking_file in \
   scripts/apply_english_frequency.py \
@@ -1750,9 +1750,22 @@ for ranking_file in \
   sources/frequencywords/en_50k.txt \
   user-data/en_dicts/en.dict.yaml \
   user-data/lua/mixed_frequency_filter.lua \
+  user-data/lua/person_name_filter.lua \
+  user-data/others/person_names.txt \
   user-data/others/script/main.go \
   user-data/others/script/rime/sort.go \
-  user-data/rime_ice.custom.yaml
+  user-data/rime_ice.custom.yaml \
+  user-data/rime_ice.schema.yaml \
+  user-data/double_pinyin.schema.yaml \
+  user-data/double_pinyin_abc.schema.yaml \
+  user-data/double_pinyin_flypy.schema.yaml \
+  user-data/double_pinyin_jiajia.schema.yaml \
+  user-data/double_pinyin_mspy.schema.yaml \
+  user-data/double_pinyin_sogou.schema.yaml \
+  user-data/double_pinyin_ziguang.schema.yaml \
+  user-data/t9.schema.yaml \
+  user-data/fr.schema.yaml \
+  user-data/melt_eng.schema.yaml
 do
   mkdir -p "$BASE/$(dirname "$ranking_file")"
   curl -fsSL --retry 3 -o "$BASE/$ranking_file" "$ranking_base/$ranking_file"

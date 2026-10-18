@@ -55,6 +55,7 @@ engine:
     - lua_translator@*calc_translator    # 计算器
     - lua_translator@*force_gc           # 暴力 GC
   filters:
+    - lua_filter@*person_name_filter
     - simplifier@traditionalize # 简繁切换
     - uniquifier # 去重
 

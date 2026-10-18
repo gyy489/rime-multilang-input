@@ -40,6 +40,7 @@ engine:
     - table_translator
     - punct_translator
   filters:
+    - lua_filter@*person_name_filter
     - uniquifier
 
 speller:

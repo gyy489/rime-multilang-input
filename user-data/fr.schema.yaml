@@ -32,6 +32,7 @@ engine:
   translators:
     - table_translator
   filters:
+    - lua_filter@*person_name_filter
     - uniquifier
 
 speller:
